@@ -34,21 +34,23 @@ Example : Let me clear for an organisation : Let’s consider a company Airtel (
 
 and so on …, you can check it by fetching the data from the twitter api by the url = "https://api.twitter.com/1.1/search/tweets.json?q=%23airtel” /
 
-What we can do with these massive information related to Airtel:
+**What we can do with these massive information related to Airtel:**
 
-We can classify the tweets as per their sentiment e.g: which tweets goes to “happiness", “anger", “just sharing or neutral” or we can classify in n ways.
+1. We can classify the tweets as per their sentiment e.g: which tweets goes to “happiness", “anger", “just sharing or neutral” or we can classify in n ways.
 
-What is the mood of information now e.g: at the time I have taken this tweets, it clearly visible the in Nigeria mood is to protest against prices hike.
+2. What is the mood of information now e.g: at the time I have taken this tweets, it clearly visible the in Nigeria mood is to protest against prices hike.
 
-Even we can compare the sentiment/mood of two or more similar kind of companies.
+3. Even we can compare the sentiment/mood of two or more similar kind of companies.
 
-we could use the data to advise the company to improve quality of care of customer on the basis of their tweets
+4. we could use the data to advise the company to improve quality of care of customer on the basis of their tweets
 
 And so on …..
 
-What are the scope to do within time limit : 1. We can do the classification/clustering 2. predict the mood/sentiment
+*What are the scope to do within time limit* : 
+1. We can do the classification/clustering 
+2. predict the mood/sentiment
 
-Technology we could use:
+**Technology we could use:**
 
 It would be better if we can use all open source to build a web page for doing above requirements, I suggest using Google App Engine, it provides enough space of storage, Both type of DB i.e NoSQL as well as MySQL, support multiple languages like : JAVA, Python, PHP, GO
 
