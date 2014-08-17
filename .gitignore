@@ -21,7 +21,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-
+*.txt
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -51,4 +51,6 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
-
+#Ingnore the following 
+.DS_Store
+.idea
