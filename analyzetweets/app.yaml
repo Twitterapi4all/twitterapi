@@ -1,0 +1,10 @@
+#webapp/app.yaml
+application: analyzetweets
+version: 2.1
+runtime: python
+api_version: 1
+threadsafe: true
+#threadsafe: false
+handlers:
+- url: .*
+  script: main.py
