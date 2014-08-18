@@ -1,4 +1,4 @@
-Twitter API for all organizations 
+Twitter API for all organisations
 ==========
 
 Initially it is a Web based twitter api for all organizations, might be also for selected organization initial, later on we have plan to extend in for various organization or any on can add organization and get the their tweets sentiments....
@@ -46,8 +46,8 @@ and so on …, you can check it by fetching the data from the twitter api by the
 
 And so on …..
 
-*What are the scope to do within time limit* : 
-1. We can do the classification/clustering 
+*What are the scope to do within time limit* :
+1. We can do the classification/clustering
 2. predict the mood/sentiment
 
 **Technology we could use:**
@@ -57,3 +57,17 @@ It would be better if we can use all open source to build a web page for doing a
 If any one what to do in any other platform are always welcome.
 
 Over the next 10 days we can do the initial task I have post which will help towards getting the final goal of this project.
+
+==========
+How to run the project on local system
+==========
+1. Install Google App Engine from https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python
+
+2. Running the development web server
+		dev_appserver.py analyzetweets
+		The web server listens on port 8080 by default. You can visit the application at this URL: http://localhost:8080/.
+		To on different port run as follow :
+		dev_appserver.py --port=9999 analyzetweets
+		To stop the web server: with Mac OS X or Unix, press Control-C or with Windows, press Control-Break in your command prompt window.
+
+3. Before running above project analyzetweets, you should have paython 2.7
