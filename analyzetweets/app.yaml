@@ -3,7 +3,7 @@ application: analyzetweets
 version: 3
 runtime: python27
 api_version: 1
-threadsafe: true
+threadsafe: no
 #threadsafe: false
 handlers:
 - url: .*
