@@ -8,8 +8,8 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 class TweetsText(db.Model):
     createdAt   = db.DateTimeProperty(auto_now_add=True)
     author      = db.UserProperty()
-    companyName = db.TextProperty()
-    tweetText   = db.TextProperty()
+    companyName = db.StringProperty(required=False)
+    tweetText   = db.TextProperty(required=False)
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
@@ -19,6 +19,7 @@ class MainHandler(webapp.RequestHandler):
             tweetstext = TweetsText.all().order('-createdAt').fetch(10)
             memcache.add('tweetstext', tweetstext)
         context = {
+            'companyName': 'Tweets Analyzer',
             'user':      user,
             'tweetstext': tweetstext,
             'login':     users.create_login_url(self.request.uri),
@@ -29,10 +30,10 @@ class MainHandler(webapp.RequestHandler):
 
 class GuestBook(webapp.RequestHandler):
     def post(self):
-        tweetsText = TweetsText()
-
-        tweetsText.tweetText = self.request.get('content')
-        tweetsText.put()
+        data = TweetsText()
+        data.companyName = 'Tweets Analyzer'
+        data.tweetText = self.request.get('content')
+        data.put()
         memcache.delete('tweetstext')
         self.redirect('/')
 
