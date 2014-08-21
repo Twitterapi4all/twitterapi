@@ -5,7 +5,7 @@ How to run the project on local system
 
 2. Running the development web server
 
-		**dev_appserver.py analyzetweets**
+		dev_appserver.py analyzetweets
 
 		The web server listens on port 8080 by default. You can visit the application at this URL: http://localhost:8080/.
 		To on different port run as follow :
