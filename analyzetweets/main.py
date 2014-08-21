@@ -35,75 +35,90 @@ class GetTweets(webapp.RequestHandler):
       # Create object of DB
       data = TweetsText()
       # Get the company name
-      companyName = self.request.get('companyName')
+      companyName = 'Tweets Analyzer'
       # Get the Tweets from twitter API or From TwitterHandler
-      THandler = TwitterHandler()
+      #THandler = TwitterHandler()
 
-      tweetTextCotainer = THandler.getTweetsText(companyName)
+      #tweetTextCotainer = THandler.getTweetsText(companyName)
 
-      for tweetText in tweetTextCotainer:
+      #for tweetText in tweetTextCotainer:
         #print tweetText
-        data.companyName = companyName
-        data.tweetText = tweetText
-        data.put()
+      #  data.companyName = companyName
+      #  data.tweetText = tweetText
+      #  data.put()
+
+      ###################
+
+      # For time being, I have commented the TwitterHandler() class since two import oauth2 as oauth
+      #  and import urllib2 as urllib is not supported by Google App Engine. In another branch
+      #  https://github.com/Twitterapi4all/twitterapi/tree/Feature/TwitterStream
+      #  trying to resove the problem
+
+      #############
+
+      # Saving the enter text as tweets and hard coded the company name as
+      data.companyName = companyName
+      data.tweetText = self.request.get('companyName')
+      # Now store the data into TweetsText DB Model
+      data.put()
 
       memcache.delete('tweetstext')
       self.redirect('/')
 
-class TwitterHandler():
-  import urllib2 as urllib
-  #access key for twitter api
-  api_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
-  api_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
-  access_token_key = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
-  access_token_secret = "DfXbSTG8v3lFRsJlRwaRjYxdi7NVFiNmX8VS0uV4ydOHZ"
-  _debug = 0
-  oauth_token    = oauth.token(key=access_token_key, secret=access_token_secret)
-  oauth_consumer = oauth.Consumer(key=api_key, secret=api_secret)
-  signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
-  http_method = "GET"
-  http_handler  = urllib.HTTPHandler(debuglevel=_debug)
-  https_handler = urllib.HTTPSHandler(debuglevel=_debug)
-  def __init__(self):
-    #self.companyName = companyName
-    self.tweetsText = []
-
-  def getTweetsText(self, companyName):
-    if companyName is None:
-      companyName = 'Airtel'
-    url = "https://api.twitter.com/1.1/search/tweets.json?q=%23" + companyName
-    parameters = []
-    response = self.twitterreq(url, "GET", parameters)
-    for line in response:
-      #print line.strip()
-      self.tweetsText.append(line.strip())
-    return self.tweetsText
-
-  def twitterreq(url, method, parameters):
-    req = oauth.Request.from_consumer_and_token(oauth_consumer,
-                                               token=oauth_token,
-                                               http_method=http_method,
-                                               http_url=url,
-                                               parameters=parameters)
-
-    req.sign_request(signature_method_hmac_sha1, oauth_consumer, oauth_token)
-
-    headers = req.to_header()
-
-    if http_method == "POST":
-      encoded_post_data = req.to_postdata()
-    else:
-      encoded_post_data = None
-      url = req.to_url()
-
-    opener = urllib.OpenerDirector()
-    opener.add_handler(http_handler)
-    opener.add_handler(https_handler)
-
-    response = opener.open(url, encoded_post_data)
-
-    return response
-
+# class TwitterHandler():
+#   import urllib2 as urllib
+#   #access key for twitter api
+#   api_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
+#   api_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
+#   access_token_key = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
+#   access_token_secret = "DfXbSTG8v3lFRsJlRwaRjYxdi7NVFiNmX8VS0uV4ydOHZ"
+#   _debug = 0
+#   oauth_token    = oauth.token(key=access_token_key, secret=access_token_secret)
+#   oauth_consumer = oauth.Consumer(key=api_key, secret=api_secret)
+#   signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
+#   http_method = "GET"
+#   http_handler  = urllib.HTTPHandler(debuglevel=_debug)
+#   https_handler = urllib.HTTPSHandler(debuglevel=_debug)
+#   def __init__(self):
+#     #self.companyName = companyName
+#     self.tweetsText = []
+#
+#   def getTweetsText(self, companyName):
+#     if companyName is None:
+#       companyName = 'Airtel'
+#     url = "https://api.twitter.com/1.1/search/tweets.json?q=%23" + companyName
+#     parameters = []
+#     response = self.twitterreq(url, "GET", parameters)
+#     for line in response:
+#       #print line.strip()
+#       self.tweetsText.append(line.strip())
+#     return self.tweetsText
+#
+#   def twitterreq(url, method, parameters):
+#     req = oauth.Request.from_consumer_and_token(oauth_consumer,
+#                                                token=oauth_token,
+#                                                http_method=http_method,
+#                                                http_url=url,
+#                                                parameters=parameters)
+#
+#     req.sign_request(signature_method_hmac_sha1, oauth_consumer, oauth_token)
+#
+#     headers = req.to_header()
+#
+#     if http_method == "POST":
+#       encoded_post_data = req.to_postdata()
+#     else:
+#       encoded_post_data = None
+#       url = req.to_url()
+#
+#     opener = urllib.OpenerDirector()
+#     opener.add_handler(http_handler)
+#     opener.add_handler(https_handler)
+#
+#     response = opener.open(url, encoded_post_data)
+#
+#     return response
+#
 
 application = webapp.WSGIApplication([
     ( '/', MainHandler),
