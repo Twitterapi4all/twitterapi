@@ -41,16 +41,16 @@ class GetTweets(webapp.RequestHandler):
       data.put()
 
       #######
-         #For time being 
+         #For time being
       ######
-      # # Get the Tweets from twitter API or From TwitterHandler
-      # companyName = self.request.get('companyName')
-      # THandler = TwitterHandler(companyName)
-      # tweetTextCotainer = THandler.getTweetsText()
-      # for tweetText in tweetTextCotainer:
-      #   data.companyName = companyName
-      #   data.tweetText = tweetText
-      #   data.put()
+      # Get the Tweets from twitter API or From TwitterHandler
+      companyName = self.request.get('companyName')
+      THandler = TwitterHandler(companyName)
+      tweetTextCotainer = THandler.getTweetsText()
+      for tweetText in tweetTextCotainer:
+        data.companyName = companyName
+        data.tweetText = tweetText
+        data.put()
 
       memcache.delete('tweetstext')
       self.redirect('/')
