@@ -40,15 +40,17 @@ class GetTweets(webapp.RequestHandler):
       # Now store the data into TweetsText DB Model
       data.put()
 
-      # Get the Tweets from twitter API or From TwitterHandler
-      companyName = self.request.get('companyName')
-      THandler = TwitterHandler(companyName)
-      tweetTextCotainer = THandler.getTweetsText()
-      for tweetText in tweetTextCotainer:
-        #print tweetText
-        data.companyName = companyName
-        data.tweetText = tweetText
-        data.put()
+      #######
+         #For time being 
+      ######
+      # # Get the Tweets from twitter API or From TwitterHandler
+      # companyName = self.request.get('companyName')
+      # THandler = TwitterHandler(companyName)
+      # tweetTextCotainer = THandler.getTweetsText()
+      # for tweetText in tweetTextCotainer:
+      #   data.companyName = companyName
+      #   data.tweetText = tweetText
+      #   data.put()
 
       memcache.delete('tweetstext')
       self.redirect('/')
@@ -82,7 +84,6 @@ class TwitterHandler():
       self.textTweet.append('@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
 
     return self.textTweet
-
 
 application = webapp.WSGIApplication([
     ( '/', MainHandler),
