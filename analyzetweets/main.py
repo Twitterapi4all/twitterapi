@@ -65,7 +65,8 @@ class TwitterHandler():
   http_handler  = urllib.HTTPHandler(debuglevel=_debug)
   https_handler = urllib.HTTPSHandler(debuglevel=_debug)
   def __init__(self):
-    #self.companyName = companyName
+    self.companyName = 'Twitter Analyzer'
+    #variable to store the all tweets text of the particular company
     self.tweetsText = []
 
   def getTweetsText(self, companyName):
@@ -103,7 +104,6 @@ class TwitterHandler():
     response = opener.open(url, encoded_post_data)
 
     return response
-
 
 application = webapp.WSGIApplication([
     ( '/', MainHandler),

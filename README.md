@@ -14,6 +14,10 @@ How to run the project on local system
 
 3. Before running above project analyzetweets, you should have paython 2.7
 
+4. Current the branch Feature/TwitterStream is not working, since oauth2 and urllib2 is not supported by Google App Engine.
+  Search for alternate of the following error
+			oauth_token    = oauth.token(key=access_token_key, secret=access_token_secret)
+			AttributeError: 'module' object has no attribute 'token'
 
 
 Twitter API for all organisations
