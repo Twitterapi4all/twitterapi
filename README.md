@@ -3,7 +3,7 @@ How to run the project on local system
 ==========
 1. Install Google App Engine from https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python
 
-2. Running the development web server
+2. Running the development web server : Go the directory twitterapi and then run the following command on terminal
 
 		dev_appserver.py analyzetweets
 
