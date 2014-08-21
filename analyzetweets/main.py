@@ -1,9 +1,11 @@
 import os
 
+
 from google.appengine.api import memcache, users
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp.template import render
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.api import oauth
 
 class TweetsText(db.Model):
     createdAt   = db.DateTimeProperty(auto_now_add=True)
@@ -28,18 +30,84 @@ class MainHandler(webapp.RequestHandler):
         tmpl = os.path.join(os.path.dirname(__file__), 'top10tweets.html')
         self.response.out.write(render(tmpl, context))
 
-class GuestBook(webapp.RequestHandler):
+class GetTweets(webapp.RequestHandler):
     def post(self):
-        data = TweetsText()
-        data.companyName = 'Tweets Analyzer'
-        data.tweetText = self.request.get('content')
+      # Create object of DB
+      data = TweetsText()
+      # Get the company name
+      companyName = self.request.get('companyName')
+      # Get the Tweets from twitter API or From TwitterHandler
+      THandler = TwitterHandler()
+
+      tweetTextCotainer = THandler.getTweetsText(companyName)
+
+      for tweetText in tweetTextCotainer:
+        #print tweetText
+        data.companyName = companyName
+        data.tweetText = tweetText
         data.put()
-        memcache.delete('tweetstext')
-        self.redirect('/')
+
+      memcache.delete('tweetstext')
+      self.redirect('/')
+
+class TwitterHandler():
+  import urllib2 as urllib
+  #access key for twitter api
+  api_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
+  api_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
+  access_token_key = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
+  access_token_secret = "DfXbSTG8v3lFRsJlRwaRjYxdi7NVFiNmX8VS0uV4ydOHZ"
+  _debug = 0
+  oauth_token    = oauth.token(key=access_token_key, secret=access_token_secret)
+  oauth_consumer = oauth.Consumer(key=api_key, secret=api_secret)
+  signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
+  http_method = "GET"
+  http_handler  = urllib.HTTPHandler(debuglevel=_debug)
+  https_handler = urllib.HTTPSHandler(debuglevel=_debug)
+  def __init__(self):
+    #self.companyName = companyName
+    self.tweetsText = []
+
+  def getTweetsText(self, companyName):
+    if companyName is None:
+      companyName = 'Airtel'
+    url = "https://api.twitter.com/1.1/search/tweets.json?q=%23" + companyName
+    parameters = []
+    response = self.twitterreq(url, "GET", parameters)
+    for line in response:
+      #print line.strip()
+      self.tweetsText.append(line.strip())
+    return self.tweetsText
+
+  def twitterreq(url, method, parameters):
+    req = oauth.Request.from_consumer_and_token(oauth_consumer,
+                                               token=oauth_token,
+                                               http_method=http_method,
+                                               http_url=url,
+                                               parameters=parameters)
+
+    req.sign_request(signature_method_hmac_sha1, oauth_consumer, oauth_token)
+
+    headers = req.to_header()
+
+    if http_method == "POST":
+      encoded_post_data = req.to_postdata()
+    else:
+      encoded_post_data = None
+      url = req.to_url()
+
+    opener = urllib.OpenerDirector()
+    opener.add_handler(http_handler)
+    opener.add_handler(https_handler)
+
+    response = opener.open(url, encoded_post_data)
+
+    return response
+
 
 application = webapp.WSGIApplication([
     ( '/', MainHandler),
-    ( '/sign', GuestBook),
+    ( '/gettweets', GetTweets),
 ], debug=True)
 
 def main():

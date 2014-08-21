@@ -1,3 +1,21 @@
+==========
+How to run the project on local system
+==========
+1. Install Google App Engine from https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python
+
+2. Running the development web server : Go the directory twitterapi and then run the following command on terminal
+
+		dev_appserver.py analyzetweets
+
+		The web server listens on port 8080 by default. You can visit the application at this URL: http://localhost:8080/.
+		To on different port run as follow :
+		dev_appserver.py --port=9999 analyzetweets
+		To stop the web server: with Mac OS X or Unix, press Control-C or with Windows, press Control-Break in your command prompt window.
+
+3. Before running above project analyzetweets, you should have paython 2.7
+
+
+
 Twitter API for all organisations
 ==========
 
@@ -57,17 +75,3 @@ It would be better if we can use all open source to build a web page for doing a
 If any one what to do in any other platform are always welcome.
 
 Over the next 10 days we can do the initial task I have post which will help towards getting the final goal of this project.
-
-==========
-How to run the project on local system
-==========
-1. Install Google App Engine from https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python
-
-2. Running the development web server
-		dev_appserver.py analyzetweets
-		The web server listens on port 8080 by default. You can visit the application at this URL: http://localhost:8080/.
-		To on different port run as follow :
-		dev_appserver.py --port=9999 analyzetweets
-		To stop the web server: with Mac OS X or Unix, press Control-C or with Windows, press Control-Break in your command prompt window.
-
-3. Before running above project analyzetweets, you should have paython 2.7

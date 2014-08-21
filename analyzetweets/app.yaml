@@ -1,6 +1,6 @@
 #webapp/app.yaml
 application: analyzetweets
-version: 3
+version: 4
 runtime: python27
 api_version: 1
 threadsafe: no
