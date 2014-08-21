@@ -44,7 +44,6 @@ class GetTweets(webapp.RequestHandler):
       companyName = self.request.get('companyName')
       THandler = TwitterHandler(companyName)
       tweetTextCotainer = THandler.getTweetsText()
-
       for tweetText in tweetTextCotainer:
         #print tweetText
         data.companyName = companyName
