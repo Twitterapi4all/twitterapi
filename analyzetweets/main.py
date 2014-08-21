@@ -1,6 +1,5 @@
 import os
-
-
+from TwitterSearch import *
 from google.appengine.api import memcache, users
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp.template import render
@@ -36,89 +35,55 @@ class GetTweets(webapp.RequestHandler):
       data = TweetsText()
       # Get the company name
       companyName = 'Tweets Analyzer'
-      # Get the Tweets from twitter API or From TwitterHandler
-      #THandler = TwitterHandler()
-
-      #tweetTextCotainer = THandler.getTweetsText(companyName)
-
-      #for tweetText in tweetTextCotainer:
-        #print tweetText
-      #  data.companyName = companyName
-      #  data.tweetText = tweetText
-      #  data.put()
-
-      ###################
-
-      # For time being, I have commented the TwitterHandler() class since two import oauth2 as oauth
-      #  and import urllib2 as urllib is not supported by Google App Engine. In another branch
-      #  https://github.com/Twitterapi4all/twitterapi/tree/Feature/TwitterStream
-      #  trying to resove the problem
-
-      #############
-
-      # Saving the enter text as tweets and hard coded the company name as
       data.companyName = companyName
       data.tweetText = self.request.get('companyName')
       # Now store the data into TweetsText DB Model
       data.put()
 
+      #######
+         #For time being 
+      ######
+      # # Get the Tweets from twitter API or From TwitterHandler
+      # companyName = self.request.get('companyName')
+      # THandler = TwitterHandler(companyName)
+      # tweetTextCotainer = THandler.getTweetsText()
+      # for tweetText in tweetTextCotainer:
+      #   data.companyName = companyName
+      #   data.tweetText = tweetText
+      #   data.put()
+
       memcache.delete('tweetstext')
       self.redirect('/')
 
-# class TwitterHandler():
-#   import urllib2 as urllib
-#   #access key for twitter api
-#   api_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
-#   api_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
-#   access_token_key = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
-#   access_token_secret = "DfXbSTG8v3lFRsJlRwaRjYxdi7NVFiNmX8VS0uV4ydOHZ"
-#   _debug = 0
-#   oauth_token    = oauth.token(key=access_token_key, secret=access_token_secret)
-#   oauth_consumer = oauth.Consumer(key=api_key, secret=api_secret)
-#   signature_method_hmac_sha1 = oauth.SignatureMethod_HMAC_SHA1()
-#   http_method = "GET"
-#   http_handler  = urllib.HTTPHandler(debuglevel=_debug)
-#   https_handler = urllib.HTTPSHandler(debuglevel=_debug)
-#   def __init__(self):
-#     #self.companyName = companyName
-#     self.tweetsText = []
-#
-#   def getTweetsText(self, companyName):
-#     if companyName is None:
-#       companyName = 'Airtel'
-#     url = "https://api.twitter.com/1.1/search/tweets.json?q=%23" + companyName
-#     parameters = []
-#     response = self.twitterreq(url, "GET", parameters)
-#     for line in response:
-#       #print line.strip()
-#       self.tweetsText.append(line.strip())
-#     return self.tweetsText
-#
-#   def twitterreq(url, method, parameters):
-#     req = oauth.Request.from_consumer_and_token(oauth_consumer,
-#                                                token=oauth_token,
-#                                                http_method=http_method,
-#                                                http_url=url,
-#                                                parameters=parameters)
-#
-#     req.sign_request(signature_method_hmac_sha1, oauth_consumer, oauth_token)
-#
-#     headers = req.to_header()
-#
-#     if http_method == "POST":
-#       encoded_post_data = req.to_postdata()
-#     else:
-#       encoded_post_data = None
-#       url = req.to_url()
-#
-#     opener = urllib.OpenerDirector()
-#     opener.add_handler(http_handler)
-#     opener.add_handler(https_handler)
-#
-#     response = opener.open(url, encoded_post_data)
-#
-#     return response
-#
+class TwitterHandler():
+  def __init__(self, companyName):
+    self.textTweet = []
+    self.cName = companyName
+    #access key for twitter api
+    self.api_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
+    self.api_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
+    self.access_token_key = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
+    self.access_token_secret = "DfXbSTG8v3lFRsJlRwaRjYxdi7NVFiNmX8VS0uV4ydOHZ"
+
+  # it's about time to create a TwitterSearch object with our secret tokens
+  def getTweetsText(self):
+    tso = TwitterSearchOrder() # create a TwitterSearchOrder object
+    tso.setKeywords(['krishna']) # let's define all words we would like to have a look for
+    tso.setLanguage('en') # we want to see German tweets only
+    tso.setCount(7) # please dear Mr Twitter, only give us 7 results per page
+    tso.setIncludeEntities(False) # and don't give us all those entity information
+
+    ts = TwitterSearch(
+      consumer_key = self.api_key,
+      consumer_secret = self.api_secret,
+      access_token = self.access_token_key,
+      access_token_secret = self.access_token_secret
+      )
+    for tweet in ts.searchTweetsIterable(tso): # this is where the fun actually starts :)
+      #print '@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text']
+      self.textTweet.append('@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
+
+    return self.textTweet
 
 application = webapp.WSGIApplication([
     ( '/', MainHandler),
