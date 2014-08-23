@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Tweets Analyzer for all organization!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="tweets analysis">
@@ -27,85 +28,215 @@
   <link rel="apple-touch-icon-precomposed" href="static/img/apple-touch-icon-57-precomposed.png">
   <link rel="shortcut icon" href="static/img/favicon.png">
 
-	<script type="text/javascript" src="static/js/jquery-2.1.0.min.js"></script>
-	<script type="text/javascript" src="static/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="static/js/bootstrap.js"></script>
 </head>
 
 <body>
-<div class="container">
-	<div class="row clearfix">
-		<div class="col-md-12 column">
-			<div class="row clearfix">
-				<div class="col-md-12 column">
-          {% if user %}
-              {{ user.nickname }}!
-              <a href="{{ logout }}" class="btn btn-primary" type="button"><b>sign out</b></a>
-          {% else %}
-              <a href="{{ login }}" class="btn btn-primary" type="button"><b>sign in</b></a>
-          {% endif %}
-				</div>
-			</div>
+  <div class="container">
+    <!-- Start Login section -->
+  	<div class="row clearfix">
+  		<div class="col-md-12 column">
+  			<div class="row clearfix">
+  				<div class="col-md-12 column">
+            {% if user %}
+                <b class="btn btn-primary"> Welcome {{ user.nickname }} !!! </b>
+                <a href="{{ logout }}" class="btn btn-primary pull-right" type="button"><b>sign out</b></a>
+            {% else %}
+                <a href="{{ login }}" class="btn btn-primary pull-right" type="button"><b>sign in</b></a>
+            {% endif %}
+  				</div>
+  			</div>
+      </div>
+    </div>
+    <!-- End Login section -->
 
-			<div class="page-header">
-
+    <!--  Start of tweets, user & developer section -->
+    <div class="row clearfix">
+      <!-- Start of tweets section -->
+      <div class="col-md-8 column">
+        <!--Form Start -->
         <form action="/gettweets" method=post>
           <div class="form-group">
             <label> Please enter the company name:</label>
-            <input name=companyName type="text" class="form-control">
+              <input name=companyName type="text" class="form-control">
+
+            <br><input type=submit value="Submit" class="btn btn-primary">
           </div>
-            <br><input type=submit value="Submit" class="btn btn-default">
         </form>
-
-        {% if companyName == 'Tweets Analyzer'%}
-          <h1>
-            First 10 recent tweets of the company : <b> {{companyName}}</b>
-				  </h1>
-        {% else %}
-          <h2>
-            Here your most recent tweets will be displayed after you enter your interest of comapny name
-          </h2>
-        {% endif %}
-
-			</div>
-
-			<ol>
-        {% for tweetText in tweetstext %}
-          <li>
-            <!-- Created At -->
-            <!-- <small>[<i>{{ tweetText.createdAt.ctime }}</i>]</small> -->
-            <b>
-              <!-- Company Name -->
-            {% if tweetText.companyName %}
-                <code>{{ tweetText.companyName }}</code>
+        <!--Form End -->
+        <!-- Start of top 10 tweets section -->
+        <div class="row clearfix">
+          <div class="col-md-12 column">
+            {% if companyName == 'Tweets Analyzer'%}
+              <h3>Top 10 recent tweets of the company : <b> {{companyName}}</b> ................</h3>
             {% else %}
-                <i>anonymous</i>
+              <h4>Here your most recent (top ten) tweets will be displayed after you
+                enter your interest of comapny name</h4>
             {% endif %}
-            </b>
-            <!-- Tweet Text -->
-            Tweets:
-            {{ tweetText.tweetText|escape }}
-            <!--  Will removed once the branch Feature/TwitterStream merge into master -->
-            <b style="color:red"> Here what you have enter is displaying, work is in progress
-              to display the tweets of the company you have entered.
-            </b>
-            <b style="color:green"> Thanks for your patience!!!</b>
+            <ol>
+              {% if tweetstext == '' %}
+                <li> first tweets here </li>
+                <li> first tweets here </li>
+                <li> first tweets here </li>
+                <li> first tweets here </li>
+              {% endif %}
 
-            <!-- Posted by -->
-            <!-- {% if tweetText.author %}
-                <code>{{ tweetText.author.nickname }}</code>
-            {% else %}
-                <i>anonymous</i>
-            {% endif %}
-            </b>
-            Posted by:
-            {{ tweetText.author.nickname|escape }} -->
+              {% for tweetText in tweetstext %}
+                <li>
+                  <!-- Created At -->
+                  <!-- <small>[<i>{{ tweetText.createdAt.ctime }}</i>]</small> -->
+                  <b>
+                    <!-- Company Name -->
+                  {% if tweetText.companyName %}
+                      <code>{{ tweetText.companyName }}</code>
+                  {% else %}
+                      <i>anonymous</i>
+                  {% endif %}
+                  </b>
+                  <!-- Tweet Text -->
+                  Tweets:
+                  {{ tweetText.tweetText|escape }}
+                  <!--  Will removed once the branch Feature/TwitterStream merge into master -->
+                  <b style="color:red"> Here what you have enter is displaying, work is in progress
+                    to display the tweets of the company you have entered.
+                  </b>
+                  <b style="color:green"> Thanks for your patience!!!</b>
+                  <!-- Posted by -->
+                  <!-- {% if tweetText.author %}
+                      <code>{{ tweetText.author.nickname }}</code>
+                  {% else %}
+                      <i>anonymous</i>
+                  {% endif %}
+                  </b>
+                  Posted by:
+                  {{ tweetText.author.nickname|escape }} -->
+                </li>
+              {% endfor %}
+            </ol>
+          </div>
+        </div>
+        <!-- End of top 10 tweets section -->
 
-          </li>
-        {% endfor %}
-			</ol>
-		</div>
-	</div>
-</div>
+        <!-- Start of classified tweets  section -->
+        <div class="row clearfix">
+          <!-- Start of happiest tweets section -->
+          <div class="col-md-4 column">
+            <h3>Happiest tweets of the company</h3>
+            <p>List of top 10 happiest tweets</p>
+            <ol>
+              <li> Top most happiest tweets </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+            </ol>
+          </div>
+          <!-- Start of happiest tweets section -->
+          <!-- Start of sad of happiest tweets section -->
+          <div class="col-md-4 column">
+            <h3>Sadness tweets of the company</h3>
+            <p>List of top 10 sadness tweets</p>
+            <ol>
+              <li> Top most sadness tweets </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+            </ol>
+          </div>
+          <!-- End of sad of happiest tweets section -->
+
+          <!-- Start of general tweets section -->
+          <div class="col-md-4 column">
+            <h3>General tweets of the company</h3>
+            <p>List of top 10 general tweets</p>
+            <ol>
+              <li> Top most general tweets </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+              <li> Second and so on </li>
+            </ol>
+          </div>
+          <!-- End of general of tweets section -->
+        </div>
+        <!-- End of classified tweets  section -->
+      </div>
+      <!-- End of tweets section -->
+
+      <!--  Start of developers information section -->
+      <div class="col-md-4 column">
+        <h1> Tweets Analysis </h1>
+        <h3> Welcome</h3>
+        <p>
+          Welcome to our open source Tweets Analysis Project!
+        </p>
+        <p>
+          This project is inspired by the course <a href="https://www.coursera.org/course/datasci" target="_blank">
+            Introduction to Data Science</a>
+            taught by <a href="http://homes.cs.washington.edu/~billhowe/" target="_blank">Bill Howe</a>
+          offered in <a href="https://www.coursera.org/" target="_blank">Coursera</a>
+
+
+        </p>
+        <p>
+          I love to collaborate with the community of data scientists
+         to develop a world class tweets classifier which can be done
+          using some classification concepts like Least Square Method,
+          Machine Learning Concepts or Natural Language Processing.
+          Valuable suggestions are always welcome...
+        </p>
+        <p>
+          <h3>  Related Resources </h3>
+          <ul>
+            <li>
+              <a href="https://github.com/Twitterapi4all/twitterapi">Github Reporitory</a>
+            </li>
+            <li>
+              <a href="https://www.coursolve.org/need/189"> Coursovle project details</a>
+            </li>
+          </ul>
+        </p>
+        <p> Here we will display the list of developers information with image and other social information
+          if the developer wish to do so.
+        </p>
+        <p>List will be displaying here </b>
+        <ol>
+          <div class="column one-fourth vcard">
+            <h3>
+                <span class="vcard-fullname" itemprop="name">Krishna Prasad</span>
+            </h3>
+            <a href="https://github.com/krishnaiitd"><img alt=" Krishna Prasad Pics" height="230" width="230"
+              src="static/img/Krishna.jpeg" >
+            </a>
+            <ul class="vcard-details">
+              <li>From <a href="http://www.iitd.ac.in/">IIT Delhi</a></li>
+              <li>Mail at <a class="email" href="mailto:kprasad.iitd@gmail.com">kprasad.iitd@gmail.com</a></li>
+            </ul>
+
+          </div>
+        </ol>
+
+      </div>
+      <!-- End of developers information section -->
+
+    </div>
+    <!-- End of tweets, user & developer section -->
+
+  </div>
+  <!-- End of container -->
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script type="text/javascript" src="static/js/jquery-2.1.0.min.js"></script>
+  <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="static/js/bootstrap.js"></script>
+
 </body>
 </html>
