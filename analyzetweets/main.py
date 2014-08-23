@@ -45,7 +45,8 @@ class GetTweets(webapp.RequestHandler):
       ######
       # Get the Tweets from twitter API or From TwitterHandler
       companyName = self.request.get('companyName')
-      THandler = TwitterHandler(companyName)
+      THandler = TwitterHandler()
+      THandler.setTwitterSearchTerm(companyName)
       tweetTextCotainer = THandler.getTweetsText()
       for tweetText in tweetTextCotainer:
         data.companyName = companyName
@@ -55,20 +56,21 @@ class GetTweets(webapp.RequestHandler):
       memcache.delete('tweetstext')
       self.redirect('/')
 
-class TwitterHandler():
-  def __init__(self, companyName):
+class TwitterHandler(object):
+  def __init__(self):
     self.textTweet = []
-    self.cName = companyName
+    self.searchterms = ''
     #access key for twitter api
     self.api_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
     self.api_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
     self.access_token_key = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
     self.access_token_secret = "DfXbSTG8v3lFRsJlRwaRjYxdi7NVFiNmX8VS0uV4ydOHZ"
-
+  def setTwitterSearchTerm(self, companyName):
+    self.searchterms = companyName
   # it's about time to create a TwitterSearch object with our secret tokens
   def getTweetsText(self):
     tso = TwitterSearchOrder() # create a TwitterSearchOrder object
-    tso.setKeywords(['krishna']) # let's define all words we would like to have a look for
+    tso.setKeywords([self.searchterms]) # let's define all words we would like to have a look for
     tso.setLanguage('en') # we want to see German tweets only
     tso.setCount(7) # please dear Mr Twitter, only give us 7 results per page
     tso.setIncludeEntities(False) # and don't give us all those entity information
