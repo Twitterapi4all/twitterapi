@@ -10,3 +10,6 @@ handlers:
   static_dir: static
 - url: .*
   script: main.py
+libraries:
+- name: ssl
+  version: latest
