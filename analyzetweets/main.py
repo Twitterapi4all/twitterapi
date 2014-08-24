@@ -6,7 +6,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import oauth
 
 import sys
-sys.path.insert(0, 'tweepy')
+sys.path.insert(0, 'tweepy-gae')
 import tweepy
 class TweetsText(db.Model):
     createdAt   = db.DateTimeProperty(auto_now_add=True)
