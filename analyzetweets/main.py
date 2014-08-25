@@ -19,7 +19,7 @@ class MainHandler(webapp.RequestHandler):
         user = users.get_current_user()
         tweetstext = memcache.get('tweetstext')
         if not tweetstext:
-            tweetstext = TweetsText.all().order('-createdAt').fetch(10)
+            tweetstext = TweetsTextDB.all().order('-createdAt').fetch(10)
             memcache.add('tweetstext', tweetstext)
         context = {
             'companyName': 'Tweets Analyzer',
