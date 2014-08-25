@@ -6,9 +6,9 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import oauth
 
 import sys
-sys.path.insert(0, 'tweepy-gae')
+sys.path.insert(0, 'tweepy')
 import tweepy
-class TweetsText(db.Model):
+class TweetsTextDB(db.Model):
     createdAt   = db.DateTimeProperty(auto_now_add=True)
     author      = db.UserProperty()
     companyName = db.StringProperty(required=False)
@@ -34,7 +34,7 @@ class MainHandler(webapp.RequestHandler):
 class GetTweets(webapp.RequestHandler):
     def post(self):
       # Create object of DB
-      data = TweetsText()
+      data = TweetsTextDB()
       # Get the company name
       companyName = 'kprasadiitd'
       data.companyName = companyName
@@ -75,10 +75,6 @@ class TwitterHandler(object):
     auth.set_access_token(self.access_token, self.access_token_secret)
 
     api = tweepy.API(auth)
-
-    # public_tweets = api.home_timeline()
-    # for tweet in public_tweets:
-    #     self.textTweet.append(tweet.text)
 
     c = tweepy.Cursor(api.search, q='Airtel')
     for tweet in c.items():
