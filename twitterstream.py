@@ -47,7 +47,7 @@ def twitterreq(url, method, parameters):
 
 def fetchsamples():
   #url = "https://stream.twitter.com/1/statuses/sample.json"
-  url = "https://api.twitter.com/1.1/search/tweets.json?q=%23airtel"
+  url = "https://api.twitter.com/1.1/search/tweets.json?q=%23mixpanel"
   parameters = []
   parameters = []
   response = twitterreq(url, "GET", parameters)
