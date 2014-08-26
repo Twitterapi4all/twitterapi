@@ -33,54 +33,59 @@ class GetTweets(webapp.RequestHandler):
     def post(self):
       # Create object of DB
       data = TweetsText()
-      # Get the company name
-      companyName = 'Tweets Analyzer'
-      data.companyName = companyName
+
+      # Temp code @todo : we removed once successfully get the live tweets
+      data.companyName = 'Tweets Analyzer'
       data.tweetText = self.request.get('companyName')
       # Now store the data into TweetsText DB Model
       data.put()
 
-      #######
-         #For time being 
-      ######
-      # # Get the Tweets from twitter API or From TwitterHandler
-      # companyName = self.request.get('companyName')
-      # THandler = TwitterHandler(companyName)
-      # tweetTextCotainer = THandler.getTweetsText()
-      # for tweetText in tweetTextCotainer:
-      #   data.companyName = companyName
-      #   data.tweetText = tweetText
-      #   data.put()
+      # Get the company name
+      companyName = self.request.get('companyName')
+      # Get the Tweets from twitter API
+      THandler = TwitterHandler()
+      THandler.setCompanyName(companyName)
+      tweetTextCotainer = THandler.getTweetsText()
+      for tweetText in tweetTextCotainer:
+        data.companyName = companyName
+        data.tweetText = tweetText
+        data.put()
 
       memcache.delete('tweetstext')
       self.redirect('/')
 
-class TwitterHandler():
-  def __init__(self, companyName):
+class TwitterHandler(object):
+  def __init__(self):
     self.textTweet = []
-    self.cName = companyName
+    self.cName = ''
     #access key for twitter api
     self.api_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
     self.api_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
     self.access_token_key = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
     self.access_token_secret = "DfXbSTG8v3lFRsJlRwaRjYxdi7NVFiNmX8VS0uV4ydOHZ"
+  def setCompanyName(self, companyName):
+    self.cName = companyName
 
-  # it's about time to create a TwitterSearch object with our secret tokens
   def getTweetsText(self):
-    tso = TwitterSearchOrder() # create a TwitterSearchOrder object
-    tso.setKeywords(['krishna']) # let's define all words we would like to have a look for
-    tso.setLanguage('en') # we want to see German tweets only
-    tso.setCount(7) # please dear Mr Twitter, only give us 7 results per page
-    tso.setIncludeEntities(False) # and don't give us all those entity information
+    wordList = [];
+    if self.cName is '':
+      wordList.append('Airtel')
+    else:
+      wordList.append(self.cName)
 
+    # it's about time to create a TwitterSearch object with our secret tokens
+    tso = TwitterSearchOrder() # create a TwitterSearchOrder object
+    tso.setKeywords(wordList)
+    tso.setLanguage('en')
+    tso.setCount(10) # only give us 10 results per page
+    tso.setIncludeEntities(False)
     ts = TwitterSearch(
       consumer_key = self.api_key,
       consumer_secret = self.api_secret,
       access_token = self.access_token_key,
       access_token_secret = self.access_token_secret
       )
-    for tweet in ts.searchTweetsIterable(tso): # this is where the fun actually starts :)
-      #print '@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text']
+    for tweet in ts.searchTweetsIterable(tso):
       self.textTweet.append('@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
 
     return self.textTweet
