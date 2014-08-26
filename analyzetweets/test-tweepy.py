@@ -1,4 +1,5 @@
 import tweepy
+import json
 
 consumer_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
 consumer_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
@@ -10,10 +11,13 @@ auth.set_access_token(access_token, access_token_secret)
 
 api = tweepy.API(auth)
 
-# public_tweets = api.home_timeline()
-# for tweet in public_tweets:
-#     print tweet.text
 
 c = tweepy.Cursor(api.search, q='Airtel')
+
+tweetJson = []
 for tweet in c.items():
-    print tweet.screenname, tweet.text
+    if tweet.lang == 'en':
+        #print tweet.text, tweet.created_at, tweet.id, tweet.author.screen_name, tweet.author.name, tweet.author.friends_count, tweet.author.followers_count, tweet.author.statuses_count, tweet.author.created_at
+        tweetJson.append({'authorScreenName':tweet.author.screen_name, 'tweetText':tweet.text})
+
+print json.dumps(tweetJson)
