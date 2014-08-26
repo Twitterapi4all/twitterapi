@@ -9,18 +9,26 @@ import sys
 sys.path.insert(0, 'tweepy')
 import tweepy
 class TweetsTextDB(db.Model):
-    createdAt   = db.DateTimeProperty(auto_now_add=True)
-    author      = db.UserProperty()
-    companyName = db.StringProperty(required=False)
-    tweetText   = db.TextProperty(required=False)
+    createdAt             = db.DateTimeProperty(auto_now_add=True)
+    logedInAuthor         = db.UserProperty()
+    companyName           = db.StringProperty(required=True)
+    tweetID               = db.StringProperty(required=True)
+    tweetText             = db.StringProperty(required=True)
+    tweetCreatedAt        = db.DateTimeProperty()
+    authorScreenName      = db.StringProperty(required=False)
+    authorName            = db.StringProperty(required=False)
+    authorFriendsCount    = db.IntegerProperty(required=False)
+    authorFollowersCount  = db.IntegerProperty(required=False)
+    authorStatusesCount   = db.IntegerProperty(required=False)
+    authorCreatedAt       = db.DateTimeProperty()
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
         user = users.get_current_user()
-        tweetstext = memcache.get('tweetstext')
+        tweetstext = memcache.get('tweetstextdb')
         if not tweetstext:
             tweetstext = TweetsTextDB.all().order('-createdAt').fetch(10)
-            memcache.add('tweetstext', tweetstext)
+            memcache.add('tweetstextdb', tweetstext)
         context = {
             'companyName': 'Tweets Analyzer',
             'user':      user,
@@ -43,7 +51,7 @@ class GetTweets(webapp.RequestHandler):
       data.put()
 
       #######
-         #For time being
+         #For time beingOptional Real-World Project
       ######
       # Get the Tweets from twitter API or From TwitterHandler
       companyName = self.request.get('companyName')
@@ -55,7 +63,7 @@ class GetTweets(webapp.RequestHandler):
         data.tweetText = tweetText
         data.put()
 
-      memcache.delete('tweetstext')
+      memcache.delete('tweetstextdb')
       self.redirect('/')
 
 class TwitterHandler(object):
