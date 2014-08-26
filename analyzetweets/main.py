@@ -1,14 +1,12 @@
 import os
+from TwitterSearch import *
 from google.appengine.api import memcache, users
 from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp.template import render
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import oauth
 
-import sys
-sys.path.insert(0, 'tweepy')
-import tweepy
-class TweetsTextDB(db.Model):
+class TweetsText(db.Model):
     createdAt   = db.DateTimeProperty(auto_now_add=True)
     author      = db.UserProperty()
     companyName = db.StringProperty(required=False)
@@ -19,7 +17,7 @@ class MainHandler(webapp.RequestHandler):
         user = users.get_current_user()
         tweetstext = memcache.get('tweetstext')
         if not tweetstext:
-            tweetstext = TweetsTextDB.all().order('-createdAt').fetch(10)
+            tweetstext = TweetsText.all().order('-createdAt').fetch(10)
             memcache.add('tweetstext', tweetstext)
         context = {
             'companyName': 'Tweets Analyzer',
@@ -34,21 +32,19 @@ class MainHandler(webapp.RequestHandler):
 class GetTweets(webapp.RequestHandler):
     def post(self):
       # Create object of DB
-      data = TweetsTextDB()
-      # Get the company name
-      companyName = 'kprasadiitd'
-      data.companyName = companyName
+      data = TweetsText()
+
+      # Temp code @todo : we removed once successfully get the live tweets
+      data.companyName = 'Tweets Analyzer'
       data.tweetText = self.request.get('companyName')
       # Now store the data into TweetsText DB Model
       data.put()
 
-      #######
-         #For time being
-      ######
-      # Get the Tweets from twitter API or From TwitterHandler
+      # Get the company name
       companyName = self.request.get('companyName')
+      # Get the Tweets from twitter API
       THandler = TwitterHandler()
-      THandler.setTwitterSearchTerm(companyName)
+      THandler.setCompanyName(companyName)
       tweetTextCotainer = THandler.getTweetsText()
       for tweetText in tweetTextCotainer:
         data.companyName = companyName
@@ -61,44 +57,38 @@ class GetTweets(webapp.RequestHandler):
 class TwitterHandler(object):
   def __init__(self):
     self.textTweet = []
-    self.searchterms = ''
+    self.cName = ''
     #access key for twitter api
-    self.consumer_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
-    self.consumer_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
-    self.access_token = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
+    self.api_key = "RXJWocF9m1fMfQnlP2ua7rG8v"
+    self.api_secret = "mCg63ep6GA35KU5lYmd0NOmgb6q1iEP9Ywg03DTuiEYZc32Cd6"
+    self.access_token_key = "283141461-x1XViSBImLaHxx5L6CwNlUoV5gVEQ562rjGTyrEA"
     self.access_token_secret = "DfXbSTG8v3lFRsJlRwaRjYxdi7NVFiNmX8VS0uV4ydOHZ"
-  def setTwitterSearchTerm(self, companyName):
-    self.searchterms = companyName
-  # it's about time to create a TwitterSearch object with our secret tokens
+  def setCompanyName(self, companyName):
+    self.cName = companyName
+
   def getTweetsText(self):
-    auth = tweepy.OAuthHandler(self.consumer_key, self.consumer_secret)
-    auth.set_access_token(self.access_token, self.access_token_secret)
+    wordList = [];
+    if self.cName is '':
+      wordList.append('Airtel')
+    else:
+      wordList.append(self.cName)
 
-    api = tweepy.API(auth)
-
-    c = tweepy.Cursor(api.search, q='Airtel')
-    for tweet in c.items():
-        self.textTweet.append(tweet.text)
+    # it's about time to create a TwitterSearch object with our secret tokens
+    tso = TwitterSearchOrder() # create a TwitterSearchOrder object
+    tso.setKeywords(wordList)
+    tso.setLanguage('en')
+    tso.setCount(10) # only give us 10 results per page
+    tso.setIncludeEntities(False)
+    ts = TwitterSearch(
+      consumer_key = self.api_key,
+      consumer_secret = self.api_secret,
+      access_token = self.access_token_key,
+      access_token_secret = self.access_token_secret
+      )
+    for tweet in ts.searchTweetsIterable(tso):
+      self.textTweet.append('@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
 
     return self.textTweet
-
-    # tso = TwitterSearchOrder() # create a TwitterSearchOrder object
-    # tso.setKeywords([self.searchterms]) # let's define all words we would like to have a look for
-    # tso.setLanguage('en') # we want to see German tweets only
-    # tso.setCount(1) # please dear Mr Twitter, only give us 1 results per page
-    # tso.setIncludeEntities(False) # and don't give us all those entity information
-    #
-    # ts = TwitterSearch(
-    #   consumer_key = self.api_key,
-    #   consumer_secret = self.api_secret,
-    #   access_token = self.access_token_key,
-    #   access_token_secret = self.access_token_secret
-    #   )
-    # for tweet in ts.searchTweetsIterable(tso): # this is where the fun actually starts :)
-    #   #print '@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text']
-    #   self.textTweet.append('@%s tweeted: %s' % ( tweet['user']['screen_name'], tweet['text'] ) )
-    #
-    # return self.textTweet
 
 application = webapp.WSGIApplication([
     ( '/', MainHandler),
