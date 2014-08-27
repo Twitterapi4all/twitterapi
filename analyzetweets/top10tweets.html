@@ -66,6 +66,11 @@
       <!-- Start of tweets section -->
       <div class="col-md-8 column">
         <!--Form Start -->
+        <p> Please select from these company :
+          {% for cName in companyNameList %}
+            <b> {{cName}}, </b>
+          {% endfor %}
+        </p>
         <form action="/gettweets" method=post>
           <div class="form-group">
             <label> Please enter the company name:</label>
@@ -74,6 +79,7 @@
             <br><input type=submit value="Submit" class="btn btn-primary">
           </div>
         </form>
+
         <!--Form End -->
         <!-- Start of top 10 tweets section -->
         <div class="row clearfix">

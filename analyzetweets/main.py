@@ -4,16 +4,16 @@ from google.appengine.ext import db, webapp
 from google.appengine.ext.webapp.template import render
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import oauth
-
+import datetime
 import sys
 sys.path.insert(0, 'tweepy')
 import tweepy
 class TweetsTextDB(db.Model):
     createdAt             = db.DateTimeProperty(auto_now_add=True)
-    logedInAuthor         = db.UserProperty()
-    companyName           = db.StringProperty(required=True)
-    tweetID               = db.StringProperty(required=True)
-    tweetText             = db.StringProperty(required=True)
+    logedInCustomer       = db.StringProperty()
+    companyName           = db.StringProperty()
+    tweetID               = db.StringProperty()
+    tweetText             = db.StringProperty()
     tweetCreatedAt        = db.DateTimeProperty()
     authorScreenName      = db.StringProperty(required=False)
     authorName            = db.StringProperty(required=False)
@@ -21,15 +21,39 @@ class TweetsTextDB(db.Model):
     authorFollowersCount  = db.IntegerProperty(required=False)
     authorStatusesCount   = db.IntegerProperty(required=False)
     authorCreatedAt       = db.DateTimeProperty()
+class UserDB(db.Model):
+    userNickName  = db.StringProperty()
+    userEmailID   = db.StringProperty()
+    userID        = db.StringProperty()
+    createdAt     = db.DateTimeProperty(auto_now_add=True)
+    logedInAt     = db.DateTimeProperty(auto_now=True)
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
         user = users.get_current_user()
+        # Update the UserDB
+        if user:
+            # Check that user already exist in our DB then update the logedInAt time
+            isUserExist = user.gql("WHERE userEmailID = :1", userEmailID=user.email())
+            if isUserExist is None:
+                userDB = UserDB(userNickName  = user.nickname(),
+                                userEmailID   = user.email(),
+                                userID        = user.user_id()
+                              )
+                userDB.logedInAt = datetime.datetime.now()
+                userDB.put()
+            else:
+              isUserExist.logedInAt = datetime.datetime.now()
+              isUserExist.save()
+
+        # Get the tweets
         tweetstext = memcache.get('tweetstextdb')
         if not tweetstext:
             tweetstext = TweetsTextDB.all().order('-createdAt').fetch(10)
             memcache.add('tweetstextdb', tweetstext)
+
         context = {
+            'companyNameList': ['Coursera', 'Google', 'Airtel'],
             'companyName': 'Tweets Analyzer',
             'user':      user,
             'tweetstext': tweetstext,
@@ -43,10 +67,24 @@ class GetTweets(webapp.RequestHandler):
     def post(self):
       # Create object of DB
       data = TweetsTextDB()
-      # Get the company name
-      companyName = 'kprasadiitd'
-      data.companyName = companyName
-      data.tweetText = self.request.get('companyName')
+      # For time just inserting the dummy data
+      user = users.get_current_user()
+      if user:
+          customerName = user.nickname()
+      else:
+          customerName = 'anonymous'
+
+      data.logedInCustomer = customerName
+      data.companyName    = 'kprasadiitd'
+      data.tweetID        = 'test-1'
+      data.tweetText      = self.request.get('companyName')
+      data.tweetCreatedAt = datetime.datetime.now().replace(day=1)
+      data.authorScreenName = 'screen name'
+      data.authorName       = 'Author Name'
+      data.authorFriendsCount = 40
+      data.authorFollowersCount = 200
+      data.authorStatusesCount = 20
+      data.authorCreatedAt      = datetime.datetime.now().replace(year=2001)
       # Now store the data into TweetsText DB Model
       data.put()
 
@@ -55,16 +93,25 @@ class GetTweets(webapp.RequestHandler):
       ######
       # Get the Tweets from twitter API or From TwitterHandler
       companyName = self.request.get('companyName')
-      THandler = TwitterHandler()
-      THandler.setTwitterSearchTerm(companyName)
-      tweetTextCotainer = THandler.getTweetsText()
-      for tweetText in tweetTextCotainer:
-        data.companyName = companyName
-        data.tweetText = tweetText
-        data.put()
+      companyNameList =  ['Coursera', 'Google', 'Airtel']
+      if companyName not in companyNameList:
+          self.redirect('/')
+      else:
+          # Read from stored DB
+          # Will add today
+          self.redirect('/')
+      # THandler = TwitterHandler()
+      # THandler.setTwitterSearchTerm(companyName)
+      # tweetTextCotainer = THandler.getTweetsText()
+      # for tweetText in tweetTextCotainer:
+      #   data.companyName = companyName
+      #   data.tweetText = tweetText
+      #   data.put()
 
       memcache.delete('tweetstextdb')
       self.redirect('/')
+
+#class ImportTweetsFromJson(webapp.RequestHandler):
 
 class TwitterHandler(object):
   def __init__(self):
