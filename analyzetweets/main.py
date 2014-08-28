@@ -32,19 +32,20 @@ class MainHandler(webapp.RequestHandler):
     def get(self):
         user = users.get_current_user()
         # Update the UserDB
+        UserDBTable = UserDB()
         if user:
             # Check that user already exist in our DB then update the logedInAt time
-            isUserExist = user.gql("WHERE userEmailID = :1", userEmailID=user.email())
-            if isUserExist is None:
-                userDB = UserDB(userNickName  = user.nickname(),
+            userExist = UserDBTable.gql("WHERE userEmailID = :1", userEmailID=user.email())
+            if userExist is None:
+                userDB = UserDBTable(userNickName  = user.nickname(),
                                 userEmailID   = user.email(),
                                 userID        = user.user_id()
                               )
                 userDB.logedInAt = datetime.datetime.now()
                 userDB.put()
-            else:
-              isUserExist.logedInAt = datetime.datetime.now()
-              isUserExist.save()
+            # else:
+            #   userExist.logedInAt = datetime.datetime.now()
+            #   userExist.put()
 
         # Get the tweets
         tweetstext = memcache.get('tweetstextdb')
@@ -112,6 +113,7 @@ class GetTweets(webapp.RequestHandler):
       self.redirect('/')
 
 #class ImportTweetsFromJson(webapp.RequestHandler):
+# date_object = datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
 
 class TwitterHandler(object):
   def __init__(self):
